@@ -6,46 +6,80 @@ body {
     margin: 0;
     padding: 0;
     font-family: "Open Sans", sans-serif;
-    min-height: 100svh;
-    list-style-type: none;
+    min-height: 100vh;
 }
 
 h1 {
     font-size: 2rem;
-}
-
-h2 {
-    font-size: 1,7rem;
+    text-align: center;
+    margin-top: 20px;
 }
 
 p {
     font-weight: 400;
+    margin: 5px 0;
 }
 
-span {
-    color: #d3233a;
+#countUsers {
+    text-align: center;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+#showActive {
+    display: block;
+    margin: 10px auto 20px auto;
+    background-color: #151947;
+    color: #fff;
+    border-radius: 50px;
+    border: none;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
 }
 
 #container {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
+    padding: 20px;
 }
 
 .card {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     text-align: center;
-    padding: 30px;
-    width: 40%;
-    height: 60%;
+    padding: 20px;
+    width: 250px;
+    height: 220px;
     background-color: blanchedalmond;
     border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
 }
 
 .card.inactive {
     opacity: 0.5;
     background-color: antiquewhite;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.tasks-info {
+    font-size: 0.9rem;
+    color: #333;
+    font-style: italic;
+    margin: 10px 0;
 }
 
 .status {
@@ -54,43 +88,38 @@ span {
     color: #fff;
     border-radius: 50px;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 16px;
     text-transform: uppercase;
-    font-weight: 700;
-    margin: 20px;
     cursor: pointer;
 }
 
 .status.active {
     background-color: #45614e;
-    color: #fff;
 }
 
 .status.inactive {
     background-color: #8b534c;
-    color: #fff;
 }
 
+/* Form */
 .user-form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-items: center;
-    width: 100%;
     margin-top: 20px;
 }
 
 .user-form label{
-    margin-top: 20px;
-    color: #151947;
+    margin-top: 10px;
     font-weight: 700;
 }
 
 .user-form input{
     border-radius: 50px;
     border: 1px solid #151947;
-    font-weight: 700;
     padding: 5px 10px;
+    width: 200px;
+    margin-top: 5px;
 }
 
 .user-form button{

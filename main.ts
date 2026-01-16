@@ -1,17 +1,18 @@
-let ul = document.querySelector("#UserListUl") as HTMLElement;
 let container = document.querySelector("#container") as HTMLDivElement;
 let form = document.querySelector(".user-form") as HTMLFormElement;
 let userName = document.querySelector("#userName") as HTMLInputElement;
 let userEmail = document.querySelector("#userEmail") as HTMLInputElement;
+let activeBtn = document.querySelector("#showActive") as HTMLButtonElement;
+let countUsersElement = document.querySelector("#countUsers") as HTMLParagraphElement;
 
 //Interface
 interface User {
-    id: number;
+    readonly id: number;
     name: string;
     email: string;
     active: boolean;
 
-    toggleDeactivate():void;
+    toggleActive():void;
 }
 
 //Class
@@ -28,93 +29,107 @@ class UserClass implements User{
         this.active = active;
     }
     
-    toggleDeactivate(): void {
+    toggleActive(): void {
     this.active = !this.active;
     }
 }
 
-// Objects - first
+// Initial Array
 let userList: User [] = [
     new UserClass (1, "Chris", "chris@email.com"),
     new UserClass (2, "Anna", "ana@email.com"),
     new UserClass (3, "Allison", "allison@email.com", false)
 ];
 
-// Create Button Deactivate
-function addDeactivateBtn(user: User): HTMLButtonElement {
+// Create Button Deactivate / Activate
+function createDeactivateButton(user: User): HTMLButtonElement {
     const btn = document.createElement("button");
     btn.textContent = user.active ? "Deactivate" : "Activate";
     btn.classList.add("status", user.active ? "active" : "inactive");
 
     btn.addEventListener("click", (event) => {
-        event.stopPropagation();
-        user.toggleDeactivate();
-        renderUser();
+        user.toggleActive();
+        countUsers();
+        renderUsers(showingActive ? getActiveUsers(userList) : userList);
     });
 
     return btn;
 };
 
-// Create li and append buttons
-function addLiUser(user: User) {
-    const li = document.createElement("li");
-    li.classList.add("user-li");
-
-    const nomeH2 = document.createElement("h2");
-    nomeH2.textContent = user.name;
-    li.appendChild(nomeH2);
-
-    const emailP = document.createElement("p");
-    emailP.textContent = user.email;
-    li.appendChild(emailP);
-
-    li.appendChild(addDeactivateBtn(user));
-    ul.appendChild(li);
-
-    return li;
+//Function Add Tasks to Users
+function getTasksElement(): HTMLParagraphElement {
+    const p = document.createElement("p");
+    p.textContent = "0 tasks assigned";
+    p.classList.add("tasks-info");
+    return p;
 }
 
-// Create Card
-function addcard(user: User): void {
+// Create card and append buttons
+function createUserCard(user: User): HTMLDivElement {
     const card = document.createElement("div");
-        card.className = "card";
+    card.classList.add("card");
 
-        card.appendChild(addLiUser(user));
+    if (!user.active) {
+        card.classList.add("inactive");
+    }
 
-        if (!user.active) {
-            card.classList.add("inactive");
-        }
-        container.appendChild(card);
-};
+    const name = document.createElement("h2");
+    name.textContent = user.name;
+
+    const email = document.createElement("p");
+    email.textContent = user.email;
+
+    card.append(name, email, getTasksElement(), createDeactivateButton(user));
+
+    return card;
+}
 
 //Function Render
-function renderUser(): void {
+function renderUsers(users: User[] = userList): void {
     container.innerHTML = "";
-
-    userList.forEach((user: User) => {
-        addcard(user);
+    users.forEach(user => {
+        container.appendChild(createUserCard(user));
     });
 }
+
+//Count Users
+function countUsers(): void {
+    countUsersElement.textContent = `Total users: ${userList.length}`;
+}
+
+// Filter Active Users
+function getActiveUsers(users: User[]): User[] {
+    return users.filter(user => user.active);
+}
+
+// State
+let showingActive = false;
+
+// Button toggle: active users / show all
+activeBtn.addEventListener("click", () => {
+    showingActive = !showingActive;
+    activeBtn.textContent = showingActive ? "Show All" : "Active Users";
+    renderUsers(showingActive ? getActiveUsers(userList) : userList);
+});
 
 //Form
 form.addEventListener("submit", (event) => {
     event.preventDefault();
     const valueName = userName.value.trim();
-    if (valueName === "") return "Please write a valid name";
+    if (valueName === "") return;
     const valueEmail = userEmail.value.trim();
-    if (valueEmail === "") return "Please write a valid email";
+    if (valueEmail === "") return;
 
     
     const newUser = new UserClass(Date.now(), valueName, valueEmail);
     userList.push(newUser);
 
-    renderUser();
+    countUsers();
+    renderUsers(showingActive ? getActiveUsers(userList) : userList);
     userName.value = "";
     userEmail.value = "";
 });
 
-// Filter Active Users
-
-
-
-renderUser();
+//Init
+countUsers();
+renderUsers();
