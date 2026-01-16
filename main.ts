@@ -1,4 +1,4 @@
-// let ul = document.querySelector("#UserListUl") as HTMLElement;
+let ul = document.querySelector("#UserListUl") as HTMLElement;
 let container = document.querySelector("#container") as HTMLDivElement;
 let form = document.querySelector(".user-form") as HTMLFormElement;
 let userName = document.querySelector("#userName") as HTMLInputElement;
@@ -11,7 +11,7 @@ interface User {
     email: string;
     active: boolean;
 
-    deactivate():void;
+    toggleDeactivate():void;
 }
 
 //Class
@@ -28,8 +28,8 @@ class UserClass implements User{
         this.active = active;
     }
     
-    deactivate(): void {
-        this.active = false;
+    toggleDeactivate(): void {
+    this.active = !this.active;
     }
 }
 
@@ -41,56 +41,58 @@ let userList: User [] = [
 ];
 
 // Create Button Deactivate
-function addButton(user: UserClass): HTMLButtonElement {
+function addDeactivateBtn(user: User): HTMLButtonElement {
     const btn = document.createElement("button");
-    btn.innerHTML = `Deactivate`;
+    btn.textContent = user.active ? "Deactivate" : "Activate";
+    btn.classList.add("status", user.active ? "active" : "inactive");
+
     btn.addEventListener("click", (event) => {
         event.stopPropagation();
-        userList = userList.filter(u => u.id !== user.id);
+        user.toggleDeactivate();
         renderUser();
     });
+
     return btn;
 };
 
+// Create li and append buttons
+function addLiUser(user: User) {
+    const li = document.createElement("li");
+    li.classList.add("user-li");
+
+    const nomeH2 = document.createElement("h2");
+    nomeH2.textContent = user.name;
+    li.appendChild(nomeH2);
+
+    const emailP = document.createElement("p");
+    emailP.textContent = user.email;
+    li.appendChild(emailP);
+
+    li.appendChild(addDeactivateBtn(user));
+    ul.appendChild(li);
+
+    return li;
+}
+
 // Create Card
-function addcard(user: UserClass): void {
+function addcard(user: User): void {
     const card = document.createElement("div");
         card.className = "card";
 
-        card.innerHTML =
-            `<h2>${user.name}<h2>
-            <p>Email:
-            <br>${user.email}</p>
-            <p class="status">${user.active ? "Active" : "Inactive"}</p>
-        `;
-        addButton(user);
+        card.appendChild(addLiUser(user));
+
+        if (!user.active) {
+            card.classList.add("inactive");
+        }
         container.appendChild(card);
 };
-
- //Function Style Active
-/*function styleActive(user: UserClass) {
-    if (user.active === true) {
-        p.classList.add("active");
-    } else {
-        p.classList.add("inactive");
-    }
-}; */
-
-
-// Create Id
-/* function createId() {
-    userList.forEach((user: UserClass) => {
-        
-    })
-} */
 
 //Function Render
 function renderUser(): void {
     container.innerHTML = "";
 
-    userList.forEach((user: UserClass) => {
+    userList.forEach((user: User) => {
         addcard(user);
-        /* styleActive(user); */
     });
 }
 
@@ -111,6 +113,8 @@ form.addEventListener("submit", (event) => {
     userEmail.value = "";
 });
 
-// Deactivate User
+// Filter Active Users
+
+
 
 renderUser();

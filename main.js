@@ -1,4 +1,4 @@
-// let ul = document.querySelector("#UserListUl") as HTMLElement;
+var ul = document.querySelector("#UserListUl");
 var container = document.querySelector("#container");
 var form = document.querySelector(".user-form");
 var userName = document.querySelector("#userName");
@@ -12,8 +12,8 @@ var UserClass = /** @class */ (function () {
         this.email = email;
         this.active = active;
     }
-    UserClass.prototype.deactivate = function () {
-        this.active = false;
+    UserClass.prototype.toggleDeactivate = function () {
+        this.active = !this.active;
     };
     return UserClass;
 }());
@@ -24,47 +24,48 @@ var userList = [
     new UserClass(3, "Allison", "allison@email.com", false)
 ];
 // Create Button Deactivate
-function addButton(user) {
+function addDeactivateBtn(user) {
     var btn = document.createElement("button");
-    btn.innerHTML = "Deactivate";
+    btn.textContent = user.active ? "Deactivate" : "Activate";
+    btn.classList.add("status", user.active ? "active" : "inactive");
     btn.addEventListener("click", function (event) {
         event.stopPropagation();
-        userList = userList.filter(function (u) { return u.id !== user.id; });
+        user.toggleDeactivate();
         renderUser();
     });
     return btn;
 }
 ;
+// Create li and append buttons
+function addLiUser(user) {
+    var li = document.createElement("li");
+    li.classList.add("user-li");
+    var nomeH2 = document.createElement("h2");
+    nomeH2.textContent = user.name;
+    li.appendChild(nomeH2);
+    var emailP = document.createElement("p");
+    emailP.textContent = user.email;
+    li.appendChild(emailP);
+    li.appendChild(addDeactivateBtn(user));
+    ul.appendChild(li);
+    return li;
+}
 // Create Card
 function addcard(user) {
     var card = document.createElement("div");
     card.className = "card";
-    card.innerHTML =
-        "<h2>".concat(user.name, "<h2>\n            <p>Email:\n            <br>").concat(user.email, "</p>\n            <p class=\"status\">").concat(user.active ? "Active" : "Inactive", "</p>\n        ");
-    addButton(user);
+    card.appendChild(addLiUser(user));
+    if (!user.active) {
+        card.classList.add("inactive");
+    }
     container.appendChild(card);
 }
 ;
-//Function Style Active
-/*function styleActive(user: UserClass) {
-    if (user.active === true) {
-        p.classList.add("active");
-    } else {
-        p.classList.add("inactive");
-    }
-}; */
-// Create Id
-/* function createId() {
-    userList.forEach((user: UserClass) => {
-        
-    })
-} */
 //Function Render
 function renderUser() {
     container.innerHTML = "";
     userList.forEach(function (user) {
         addcard(user);
-        /* styleActive(user); */
     });
 }
 //Form
@@ -82,5 +83,5 @@ form.addEventListener("submit", function (event) {
     userName.value = "";
     userEmail.value = "";
 });
-// Deactivate User
+// Filter Active Users
 renderUser();

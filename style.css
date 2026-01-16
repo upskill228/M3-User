@@ -7,6 +7,7 @@ body {
     padding: 0;
     font-family: "Open Sans", sans-serif;
     min-height: 100svh;
+    list-style-type: none;
 }
 
 h1 {
@@ -42,10 +43,32 @@ span {
     border-radius: 15px;
 }
 
+.card.inactive {
+    opacity: 0.5;
+    background-color: antiquewhite;
+}
+
 .status {
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    text-decoration: underline;
+    color: #fff;
+    border-radius: 50px;
+    border: none;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin: 20px;
+    cursor: pointer;
+}
+
+.status.active {
+    background-color: #45614e;
+    color: #fff;
+}
+
+.status.inactive {
+    background-color: #8b534c;
+    color: #fff;
 }
 
 .user-form {
@@ -79,4 +102,5 @@ span {
     text-transform: uppercase;
     font-weight: 700;
     margin: 20px;
+    cursor: pointer;
 }
