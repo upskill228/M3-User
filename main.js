@@ -28,7 +28,7 @@ var userList = [
 function createDeactivateButton(user) {
     var btn = document.createElement("button");
     btn.textContent = user.active ? "Deactivate" : "Activate";
-    btn.classList.add("status", user.active ? "active" : "inactive");
+    btn.classList.add("btn-status", user.active ? "active" : "inactive");
     btn.addEventListener("click", function (event) {
         user.toggleActive();
         countUsers();
@@ -55,7 +55,10 @@ function createUserCard(user) {
     name.textContent = user.name;
     var email = document.createElement("p");
     email.textContent = user.email;
-    card.append(name, email, getTasksElement(), createDeactivateButton(user));
+    var statusText = document.createElement("p");
+    statusText.textContent = user.active ? "Status: Active" : "Status: Inactive";
+    statusText.classList.add("user-status");
+    card.append(name, email, getTasksElement(), statusText, createDeactivateButton(user));
     return card;
 }
 //Function Render

@@ -82,7 +82,18 @@ h2 {
     margin: 10px 0;
 }
 
-.status {
+.user-status {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 8px 0;
+    color: #151947;
+}
+
+.card.inactive .user-status {
+    color: #8b534c;
+}
+
+.btn-status {
     font-size: 0.8rem;
     font-weight: 700;
     color: #fff;
@@ -93,11 +104,11 @@ h2 {
     cursor: pointer;
 }
 
-.status.active {
+.btn-status.active {
     background-color: #45614e;
 }
 
-.status.inactive {
+.btn-status.inactive {
     background-color: #8b534c;
 }
 

@@ -45,7 +45,7 @@ let userList: User [] = [
 function createDeactivateButton(user: User): HTMLButtonElement {
     const btn = document.createElement("button");
     btn.textContent = user.active ? "Deactivate" : "Activate";
-    btn.classList.add("status", user.active ? "active" : "inactive");
+    btn.classList.add("btn-status", user.active ? "active" : "inactive");
 
     btn.addEventListener("click", (event) => {
         user.toggleActive();
@@ -79,7 +79,11 @@ function createUserCard(user: User): HTMLDivElement {
     const email = document.createElement("p");
     email.textContent = user.email;
 
-    card.append(name, email, getTasksElement(), createDeactivateButton(user));
+    const statusText = document.createElement("p");
+    statusText.textContent = user.active ? "Status: Active" : "Status: Inactive";
+    statusText.classList.add("user-status");
+
+    card.append(name, email, getTasksElement(), statusText, createDeactivateButton(user));
 
     return card;
 }
