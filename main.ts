@@ -17,7 +17,10 @@ const modal = document.querySelector("#infoModal") as HTMLDivElement;
 const modalBody = document.querySelector("#modalBody") as HTMLDivElement;
 const btnClose = document.querySelector("#infoClose") as HTMLButtonElement;
 
-// INTERFACE
+// TYPE & INTERFACE
+
+type FilterType = "all" | "active" | "inactive";
+
 interface User {
     readonly id: number;
     name: string;
@@ -46,7 +49,6 @@ class UserClass implements User {
 }
 
 // STATE
-type FilterType = "all" | "active" | "inactive";
 let currentFilter: FilterType = "all";
 let searchTerm = "";
 let isOrderedAZ = false;

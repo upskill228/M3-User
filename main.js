@@ -24,6 +24,7 @@ class UserClass {
         this.active = !this.active;
     }
 }
+// STATE
 let currentFilter = "all";
 let searchTerm = "";
 let isOrderedAZ = false;
