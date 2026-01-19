@@ -20,7 +20,7 @@ p {
     margin: 5px 0;
 }
 
-#stats {
+#global-data {
     display: flex;
     flex-direction: column;
 }

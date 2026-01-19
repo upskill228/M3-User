@@ -63,7 +63,7 @@ function updateButtonsText() {
     btnOrder.textContent =
         isOrderedAZ ? "Clear Order" : "Order A-Z";
 }
-function updateUI() {
+function updateGlobalData() {
     renderUsers(getVisibleUsers());
     updateButtonsText();
     statistics();
@@ -82,7 +82,7 @@ function createDeactivateButton(user) {
     btn.addEventListener("click", function (e) {
         e.stopPropagation();
         user.toggleActive();
-        updateUI();
+        updateGlobalData();
     });
     return btn;
 }
@@ -93,7 +93,7 @@ function addDeleteButton(user) {
     btn.addEventListener("click", function (e) {
         e.stopPropagation();
         userList = userList.filter(function (u) { return u.id !== user.id; });
-        updateUI();
+        updateGlobalData();
     });
     return btn;
 }
@@ -144,20 +144,20 @@ form.addEventListener("submit", function (e) {
     userList.push(new UserClass(Date.now(), name, email));
     userName.value = "";
     userEmail.value = "";
-    updateUI();
+    updateGlobalData();
 });
 // FILTER BUTTONS
 activeBtn.addEventListener("click", function () {
     currentFilter = currentFilter === "active" ? "all" : "active";
-    updateUI();
+    updateGlobalData();
 });
 inactiveBtn.addEventListener("click", function () {
     currentFilter = currentFilter === "inactive" ? "all" : "inactive";
-    updateUI();
+    updateGlobalData();
 });
 btnOrder.addEventListener("click", function () {
     isOrderedAZ = !isOrderedAZ;
-    updateUI();
+    updateGlobalData();
 });
 // MODAL
 function openUserModal(user) {
@@ -174,4 +174,4 @@ document.addEventListener("keydown", function (e) {
         modal.classList.remove("show");
 });
 // INIT
-updateUI();
+updateGlobalData();

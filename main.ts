@@ -86,7 +86,7 @@ function updateButtonsText(): void {
         isOrderedAZ ? "Clear Order" : "Order A-Z";
 }
 
-function updateUI(): void {
+function updateGlobalData(): void {
     renderUsers(getVisibleUsers());
     updateButtonsText();
     statistics();
@@ -108,7 +108,7 @@ function createDeactivateButton(user: User): HTMLButtonElement {
     btn.addEventListener("click", e => {
         e.stopPropagation();
         user.toggleActive();
-        updateUI();
+        updateGlobalData();
     });
 
     return btn;
@@ -122,7 +122,7 @@ function addDeleteButton(user: User): HTMLButtonElement {
     btn.addEventListener("click", e => {
         e.stopPropagation();
         userList = userList.filter(u => u.id !== user.id);
-        updateUI();
+        updateGlobalData();
     });
 
     return btn;
@@ -201,23 +201,23 @@ form.addEventListener("submit", e => {
     userName.value = "";
     userEmail.value = "";
 
-    updateUI();
+    updateGlobalData();
 });
 
 // FILTER BUTTONS
 activeBtn.addEventListener("click", () => {
     currentFilter = currentFilter === "active" ? "all" : "active";
-    updateUI();
+    updateGlobalData();
 });
 
 inactiveBtn.addEventListener("click", () => {
     currentFilter = currentFilter === "inactive" ? "all" : "inactive";
-    updateUI();
+    updateGlobalData();
 });
 
 btnOrder.addEventListener("click", () => {
     isOrderedAZ = !isOrderedAZ;
-    updateUI();
+    updateGlobalData();
 });
 
 // MODAL
@@ -242,4 +242,4 @@ document.addEventListener("keydown", e => {
 });
 
 // INIT
-updateUI();
+updateGlobalData();
