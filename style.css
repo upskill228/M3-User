@@ -133,6 +133,12 @@ h2 {
     margin-top: 5px;
 }
 
+#formError{
+    color: red;
+    font-weight: 700;
+    margin: 5px 0;
+}
+
 .user-form button{
     background-color: #151947;
     color: #fff;
