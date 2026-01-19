@@ -12,6 +12,7 @@ const countUsersElement = document.querySelector("#countUsers") as HTMLParagraph
 const formError = document.querySelector("#formError") as HTMLParagraphElement;
 
 const searchInput = document.querySelector("#searchUser") as HTMLInputElement;
+const clearSearchBtn = document.querySelector(".clear-search") as HTMLButtonElement;
 
 const modal = document.querySelector("#infoModal") as HTMLDivElement;
 const modalBody = document.querySelector("#modalBody") as HTMLDivElement;
@@ -68,7 +69,6 @@ function loadInitialUsers(): void {
     const initialData = [
         { name: "Mark", email: "mark@email.com" },
         { name: "Sophia", email: "sophia@email.com", active: false },
-        { name: "Allison", email: "allison@email.com", active: false },
         { name: "Brian", email: "brian@email.com",},
         { name: "Diana", email: "diana@email.com", active: false }
     ];
@@ -111,7 +111,7 @@ function updateButtonsText(): void {
         isOrderedAZ ? "Original Order" : "Order A-Z";
 }
 
-function updateGlobalData(): void {
+function updateUI(): void {
     renderUsers(getVisibleUsers());
     updateButtonsText();
     statistics();
@@ -122,24 +122,30 @@ activeBtn.addEventListener("click", () => {
     currentFilter = currentFilter === "active" ? "all" : "active";
     searchTerm = "";
     searchInput.value = "";
-    updateGlobalData();
+    updateUI();
 });
 
 inactiveBtn.addEventListener("click", () => {
     currentFilter = currentFilter === "inactive" ? "all" : "inactive";
     searchTerm = "";
     searchInput.value = "";
-    updateGlobalData();
+    updateUI();
 });
 
 btnOrder.addEventListener("click", () => {
     isOrderedAZ = !isOrderedAZ;
-    updateGlobalData();
+    updateUI();
 });
 
 searchInput.addEventListener("input", () => {
     searchTerm = searchInput.value.trim();
-    updateGlobalData();
+    updateUI();
+});
+
+clearSearchBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    searchTerm = "";
+    updateUI();
 });
 
 // CARD ELEMENTS 
@@ -158,7 +164,7 @@ function createDeactivateButton(user: User): HTMLButtonElement {
     btn.addEventListener("click", e => {
         e.stopPropagation();
         user.toggleActive();
-        updateGlobalData();
+        updateUI();
     });
 
     return btn;
@@ -166,14 +172,14 @@ function createDeactivateButton(user: User): HTMLButtonElement {
 
 function addDeleteButton(user: User): HTMLButtonElement {
     const btn = document.createElement("button");
-    btn.textContent = "Delete";
+    btn.innerHTML = `<i class="fa-solid fa-trash-can"></i>`;
     btn.classList.add("btnDelete");
 
     btn.addEventListener("click", e => {
         e.stopPropagation();
         userList = userList.filter(u => u.id !== user.id);
 
-        updateGlobalData();
+        updateUI();
     });
 
     return btn;
@@ -184,41 +190,38 @@ function createUserCard(user: User): HTMLDivElement {
     card.classList.add("card");
     if (!user.active) card.classList.add("inactive");
 
-    // Destacar se for o último usuário adicionado
-    if (user.id === nextId - 1) {
-        card.classList.add("new-user");
-        setTimeout(() => card.classList.remove("new-user"), 1000);
-    }
-
-    // User ID
     const userId = document.createElement("p");
     userId.textContent = `ID: ${user.id}`;
     userId.classList.add("user-id");
 
-    // Name
     const name = document.createElement("h2");
     name.textContent = user.name;
 
-    // Email
     const email = document.createElement("p");
     email.textContent = user.email;
 
-    // Status
     const status = document.createElement("p");
     status.textContent = user.active ? "Status: Active" : "Status: Inactive";
     status.classList.add("user-status");
 
-    // Buttons
     const deactivateBtn = createDeactivateButton(user);
     const deleteBtn = addDeleteButton(user);
-
-    // Tasks placeholder
     const tasks = getTasksElement();
 
-    // Append all elements in logical order
-    card.append(userId, name, email, tasks, status, deactivateBtn, deleteBtn);
+    const header = document.createElement("div");
+    header.classList.add("card-header");
+    header.append(userId, name);
 
-    // Clicking card opens modal (buttons already stop propagation)
+    const body = document.createElement("div");
+    body.classList.add("card-body");
+    body.append(email, tasks, status);
+
+    const footer = document.createElement("div");
+    footer.classList.add("card-footer");
+    footer.append(deactivateBtn, deleteBtn);
+
+    card.append(header, body, footer);
+
     card.addEventListener("click", () => openUserModal(user));
 
     return card;
@@ -288,7 +291,7 @@ form.addEventListener("submit", e => {
     userName.value = "";
     userEmail.value = "";
 
-    updateGlobalData();
+    updateUI();
 });
 
 // MODAL
@@ -316,4 +319,4 @@ document.addEventListener("keydown", e => {
 loadInitialUsers();
 
 // INIT
-updateGlobalData();
+updateUI();

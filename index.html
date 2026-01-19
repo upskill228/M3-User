@@ -11,13 +11,43 @@
 </head>
 <body>
     <main>
-        <h1>User Management</h1>
-        <input
-            type="text"
-            id="searchUser"
-            placeholder="Search user by name..."
-            aria-label="Search user by name"
-        />
+        <header>
+            <div class="logo-title">
+                <i class="fa-solid fa-user"></i>
+                <h1>User Management</h1>
+            </div>
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    id="searchUser"
+                    placeholder="Search user by name..."
+                    aria-label="Search user by name"
+                />
+                <button
+                    type="button"
+                    class="clear-search"
+                    aria-label="Clear search"
+                >
+                    &times;
+                </button>
+            </div>
+        </header>
+        <section class="add-user">
+            <h2>Add new user</h2>
+            <form class="user-form" action="">
+                <fieldset>
+                    <label for="userName">Username:<span aria-hidden="true"> *</span></label>
+                    <input type="text" id="userName" name="userName" placeholder="John Doe" required>
+                </fieldset>
+                <fieldset>
+                    <label for="userEmail">User Email:<span aria-hidden="true"> *</span></label>
+                    <input type="email" id="userEmail" name="userEmail" placeholder="johndoe@email.com" required>
+                </fieldset>
+                <p id="formError"></p>
+                <button type="submit">Add</button>
+            </form>
+        </section>
         <div id="global-data">
             <p id="countUsers"></p>
             <div class="statsBtn-container">
@@ -28,18 +58,6 @@
         </div>
         <div id="container">
         </div>
-        <form class="user-form" action="">
-            <fieldset>
-                <label for="userName">Username:<span aria-hidden="true"> *</span></label>
-                <input type="text" id="userName" name="userName" placeholder="John Doe" required>
-            </fieldset>
-            <fieldset>
-                <label for="userEmail">User Email:<span aria-hidden="true"> *</span></label>
-                <input type="email" id="userEmail" name="userEmail" placeholder="johndoe@email.com" required>
-            </fieldset>
-            <p id="formError"></p>
-            <button type="submit">Add</button>
-        </form>
     </main>
      <!-- MODAL - MORE INFO -->
     <div
