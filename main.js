@@ -166,6 +166,12 @@ document.addEventListener("keydown", function (e) {
         modal.classList.remove("show");
     }
 });
+// Falta apenas:
+// Uma função dedicada
+// Um cálculo de percentagem
+// Chamar essa função sempre que algo mudar
+function statistics() {
+}
 //Init
 countUsers();
 renderUsers();
