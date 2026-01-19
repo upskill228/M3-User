@@ -1,8 +1,23 @@
+<<<<<<< HEAD
 // ELEMENTS
 const container = document.querySelector("#container") as HTMLDivElement;
 const form = document.querySelector(".user-form") as HTMLFormElement;
 const userName = document.querySelector("#userName") as HTMLInputElement;
 const userEmail = document.querySelector("#userEmail") as HTMLInputElement;
+=======
+let container = document.querySelector("#container") as HTMLDivElement;
+let form = document.querySelector(".user-form") as HTMLFormElement;
+let userName = document.querySelector("#userName") as HTMLInputElement;
+let userEmail = document.querySelector("#userEmail") as HTMLInputElement;
+let activeBtn = document.querySelector("#showActive") as HTMLButtonElement;
+let inactiveBtn = document.querySelector("#showInactive") as HTMLButtonElement;
+let btnOrder = document.querySelector("#btnOrder") as HTMLButtonElement;
+let countUsersElement = document.querySelector("#countUsers") as HTMLParagraphElement;
+let formError = document.querySelector("#formError") as HTMLParagraphElement;
+let modal = document.querySelector("#infoModal") as HTMLDivElement;
+let modalBody = document.querySelector("#modalBody") as HTMLDivElement;
+let btnClose = document.querySelector("#infoClose") as HTMLButtonElement;
+>>>>>>> d91791d50e47d9736f71de26edf0d96fbc8ce8d7
 
 const activeBtn = document.querySelector("#showActive") as HTMLButtonElement;
 const inactiveBtn = document.querySelector("#showInactive") as HTMLButtonElement;
@@ -21,7 +36,12 @@ interface User {
     name: string;
     email: string;
     active: boolean;
+<<<<<<< HEAD
     toggleActive(): void;
+=======
+
+    toggleActive():void;
+>>>>>>> d91791d50e47d9736f71de26edf0d96fbc8ce8d7
 }
 
 class UserClass implements User {
