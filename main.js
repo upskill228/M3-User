@@ -1,57 +1,69 @@
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 // ELEMENTS
-var container = document.querySelector("#container");
-var form = document.querySelector(".user-form");
-var userName = document.querySelector("#userName");
-var userEmail = document.querySelector("#userEmail");
-var activeBtn = document.querySelector("#showActive");
-var inactiveBtn = document.querySelector("#showInactive");
-var btnOrder = document.querySelector("#btnOrder");
-var countUsersElement = document.querySelector("#countUsers");
-var formError = document.querySelector("#formError");
-var modal = document.querySelector("#infoModal");
-var modalBody = document.querySelector("#modalBody");
-var btnClose = document.querySelector("#infoClose");
-var UserClass = /** @class */ (function () {
-    function UserClass(id, name, email, active) {
-        if (active === void 0) { active = true; }
+const container = document.querySelector("#container");
+const form = document.querySelector(".user-form");
+const userName = document.querySelector("#userName");
+const userEmail = document.querySelector("#userEmail");
+const activeBtn = document.querySelector("#showActive");
+const inactiveBtn = document.querySelector("#showInactive");
+const btnOrder = document.querySelector("#btnOrder");
+const countUsersElement = document.querySelector("#countUsers");
+const formError = document.querySelector("#formError");
+const searchInput = document.querySelector("#searchUser");
+const modal = document.querySelector("#infoModal");
+const modalBody = document.querySelector("#modalBody");
+const btnClose = document.querySelector("#infoClose");
+// CLASS
+class UserClass {
+    constructor(id, name, email, active = true) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.active = active;
     }
-    UserClass.prototype.toggleActive = function () {
+    toggleActive() {
         this.active = !this.active;
-    };
-    return UserClass;
-}());
+    }
+}
+let currentFilter = "all";
+let searchTerm = "";
+let isOrderedAZ = false;
 // INITIAL DATA
-var userList = [
+let userList = [
     new UserClass(1, "Chris", "chris@email.com"),
     new UserClass(2, "Anna", "ana@email.com"),
     new UserClass(3, "Allison", "allison@email.com", false)
 ];
-var currentFilter = "all";
-var isOrderedAZ = false;
-// BUTTONS
+// NEXT ID
+let nextId = userList.length > 0 ? Math.max(...userList.map(u => u.id)) + 1 : 1;
+// FUNCTION TO LOAD INITIAL USERS
+function loadInitialUsers() {
+    const initialData = [
+        { name: "Mark", email: "mark@email.com" },
+        { name: "Sophia", email: "sophia@email.com", active: false },
+        { name: "Allison", email: "allison@email.com", active: false },
+        { name: "Brian", email: "brian@email.com", },
+        { name: "Diana", email: "diana@email.com", active: false }
+    ];
+    const newUsers = initialData.map(data => {
+        const user = new UserClass(nextId, data.name, data.email, data.active);
+        nextId++;
+        return user;
+    });
+    userList = [...userList, ...newUsers];
+}
+// BUTTONS - FUNCTIONS
 function getVisibleUsers() {
-    var users = __spreadArray([], userList, true);
-    if (currentFilter === "active") {
-        users = users.filter(function (user) { return user.active; });
-    }
-    if (currentFilter === "inactive") {
-        users = users.filter(function (user) { return !user.active; });
-    }
+    let users = userList.filter(user => {
+        if (currentFilter === "active" && !user.active)
+            return false;
+        if (currentFilter === "inactive" && user.active)
+            return false;
+        if (searchTerm && !user.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            return false;
+        return true;
+    });
     if (isOrderedAZ) {
-        users.sort(function (a, b) { return a.name.localeCompare(b.name); });
+        users = [...users].sort((a, b) => a.name.localeCompare(b.name));
     }
     return users;
 }
@@ -61,25 +73,46 @@ function updateButtonsText() {
     inactiveBtn.textContent =
         currentFilter === "inactive" ? "Show All" : "Inactive Users";
     btnOrder.textContent =
-        isOrderedAZ ? "Clear Order" : "Order A-Z";
+        isOrderedAZ ? "Original Order" : "Order A-Z";
 }
 function updateGlobalData() {
     renderUsers(getVisibleUsers());
     updateButtonsText();
     statistics();
 }
+// EVENT LISTENERS
+activeBtn.addEventListener("click", () => {
+    currentFilter = currentFilter === "active" ? "all" : "active";
+    searchTerm = "";
+    searchInput.value = "";
+    updateGlobalData();
+});
+inactiveBtn.addEventListener("click", () => {
+    currentFilter = currentFilter === "inactive" ? "all" : "inactive";
+    searchTerm = "";
+    searchInput.value = "";
+    updateGlobalData();
+});
+btnOrder.addEventListener("click", () => {
+    isOrderedAZ = !isOrderedAZ;
+    updateGlobalData();
+});
+searchInput.addEventListener("input", () => {
+    searchTerm = searchInput.value.trim();
+    updateGlobalData();
+});
 // CARD ELEMENTS 
 function getTasksElement() {
-    var p = document.createElement("p");
+    const p = document.createElement("p");
     p.textContent = "0 tasks assigned";
     p.classList.add("tasks-info");
     return p;
 }
 function createDeactivateButton(user) {
-    var btn = document.createElement("button");
+    const btn = document.createElement("button");
     btn.textContent = user.active ? "Deactivate" : "Activate";
     btn.classList.add("btn-status", user.active ? "active" : "inactive");
-    btn.addEventListener("click", function (e) {
+    btn.addEventListener("click", e => {
         e.stopPropagation();
         user.toggleActive();
         updateGlobalData();
@@ -87,52 +120,79 @@ function createDeactivateButton(user) {
     return btn;
 }
 function addDeleteButton(user) {
-    var btn = document.createElement("button");
+    const btn = document.createElement("button");
     btn.textContent = "Delete";
     btn.classList.add("btnDelete");
-    btn.addEventListener("click", function (e) {
+    btn.addEventListener("click", e => {
         e.stopPropagation();
-        userList = userList.filter(function (u) { return u.id !== user.id; });
+        userList = userList.filter(u => u.id !== user.id);
         updateGlobalData();
     });
     return btn;
 }
 function createUserCard(user) {
-    var card = document.createElement("div");
+    const card = document.createElement("div");
     card.classList.add("card");
     if (!user.active)
         card.classList.add("inactive");
-    var name = document.createElement("h2");
+    // User ID
+    const userId = document.createElement("p");
+    userId.textContent = `ID: ${user.id}`;
+    userId.classList.add("user-id");
+    // Name
+    const name = document.createElement("h2");
     name.textContent = user.name;
-    var email = document.createElement("p");
+    // Email
+    const email = document.createElement("p");
     email.textContent = user.email;
-    var status = document.createElement("p");
+    // Status
+    const status = document.createElement("p");
     status.textContent = user.active ? "Status: Active" : "Status: Inactive";
     status.classList.add("user-status");
-    card.append(name, email, getTasksElement(), status, createDeactivateButton(user), addDeleteButton(user));
-    card.addEventListener("click", function () { return openUserModal(user); });
+    // Buttons
+    const deactivateBtn = createDeactivateButton(user);
+    const deleteBtn = addDeleteButton(user);
+    // Tasks placeholder
+    const tasks = getTasksElement();
+    // Append all elements in logical order
+    card.append(userId, name, email, tasks, status, deactivateBtn, deleteBtn);
+    // Clicking card opens modal (buttons already stop propagation)
+    card.addEventListener("click", () => openUserModal(user));
     return card;
 }
 //RENDER
 function renderUsers(users) {
     container.innerHTML = "";
-    users.forEach(function (user) { return container.appendChild(createUserCard(user)); });
+    users.forEach(user => container.appendChild(createUserCard(user)));
 }
 // STATISTICS
 function statistics() {
-    var total = userList.length;
-    var active = userList.filter(function (u) { return u.active; }).length;
-    var percentActive = total === 0 ? 0 : Math.round((active / total) * 100);
-    var percentInactive = total === 0 ? 0 : Math.round((active / total) * 100);
-    countUsersElement.innerHTML = "\n        Total users: ".concat(total, "<br>\n        Active users: ").concat(percentActive, "%<br>\n        Inactive users: ").concat(percentInactive, "%\n    ");
+    const total = userList.length;
+    const active = userList.filter(u => u.active).length;
+    const inactive = total - active;
+    let percentActive;
+    let percentInactive;
+    if (total === 0) {
+        percentActive = 0;
+        percentInactive = 0;
+    }
+    else {
+        percentActive = Math.round((active / total) * 100);
+        percentInactive = 100 - percentActive;
+    }
+    countUsersElement.innerHTML = `
+        Total users: ${total}<br>
+        Active users: ${percentActive}%<br>
+        Inactive users: ${percentInactive}%`;
 }
+;
 // FORM
-form.addEventListener("submit", function (e) {
+form.addEventListener("submit", e => {
     e.preventDefault();
     formError.textContent = "";
-    var name = userName.value.trim();
-    var email = userEmail.value.trim();
-    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const name = userName.value.trim();
+    const email = userEmail.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!name) {
         formError.textContent = "Please enter a valid name.";
         return;
@@ -141,37 +201,33 @@ form.addEventListener("submit", function (e) {
         formError.textContent = "Please enter a valid email.";
         return;
     }
-    userList.push(new UserClass(Date.now(), name, email));
+    const newUser = new UserClass(nextId, name, email);
+    nextId++; // incrementa o ID para o próximo
+    userList.push(newUser);
     userName.value = "";
     userEmail.value = "";
     updateGlobalData();
 });
-// FILTER BUTTONS
-activeBtn.addEventListener("click", function () {
-    currentFilter = currentFilter === "active" ? "all" : "active";
-    updateGlobalData();
-});
-inactiveBtn.addEventListener("click", function () {
-    currentFilter = currentFilter === "inactive" ? "all" : "inactive";
-    updateGlobalData();
-});
-btnOrder.addEventListener("click", function () {
-    isOrderedAZ = !isOrderedAZ;
-    updateGlobalData();
-});
 // MODAL
 function openUserModal(user) {
-    modalBody.innerHTML = "\n        <p><strong>ID:</strong> ".concat(user.id, "</p>\n        <p><strong>Name:</strong> ").concat(user.name, "</p>\n        <p><strong>Email:</strong> ").concat(user.email, "</p>\n        <p><strong>Status:</strong> ").concat(user.active ? "Active" : "Inactive", "</p>\n    ");
+    modalBody.innerHTML = `
+        <p><strong>ID:</strong> ${user.id}</p>
+        <p><strong>Name:</strong> ${user.name}</p>
+        <p><strong>Email:</strong> ${user.email}</p>
+        <p><strong>Status:</strong> ${user.active ? "Active" : "Inactive"}</p>
+    `;
     modal.classList.add("show");
 }
-btnClose.addEventListener("click", function () { return modal.classList.remove("show"); });
-modal.addEventListener("click", function (e) {
+btnClose.addEventListener("click", () => modal.classList.remove("show"));
+modal.addEventListener("click", e => {
     if (e.target === modal)
         modal.classList.remove("show");
 });
-document.addEventListener("keydown", function (e) {
+document.addEventListener("keydown", e => {
     if (e.key === "Escape")
         modal.classList.remove("show");
 });
+//LOAD INITIAL USERS
+loadInitialUsers();
 // INIT
 updateGlobalData();

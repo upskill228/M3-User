@@ -11,11 +11,13 @@ const btnOrder = document.querySelector("#btnOrder") as HTMLButtonElement;
 const countUsersElement = document.querySelector("#countUsers") as HTMLParagraphElement;
 const formError = document.querySelector("#formError") as HTMLParagraphElement;
 
+const searchInput = document.querySelector("#searchUser") as HTMLInputElement;
+
 const modal = document.querySelector("#infoModal") as HTMLDivElement;
 const modalBody = document.querySelector("#modalBody") as HTMLDivElement;
 const btnClose = document.querySelector("#infoClose") as HTMLButtonElement;
 
-// INTERFACE & CLASS
+// INTERFACE
 interface User {
     readonly id: number;
     name: string;
@@ -24,6 +26,7 @@ interface User {
     toggleActive(): void;
 }
 
+// CLASS
 class UserClass implements User {
     id: number;
     name: string;
@@ -42,6 +45,13 @@ class UserClass implements User {
     }
 }
 
+// STATE
+type FilterType = "all" | "active" | "inactive";
+let currentFilter: FilterType = "all";
+let searchTerm = "";
+let isOrderedAZ = false;
+
+
 // INITIAL DATA
 let userList: User[] = [
     new UserClass(1, "Chris", "chris@email.com"),
@@ -49,40 +59,45 @@ let userList: User[] = [
     new UserClass(3, "Allison", "allison@email.com", false)
 ];
 
-// INITIAL ORDER - ARRAY
-const originalOrder: number[] = userList.map(user => user.id);
+// NEXT ID
+let nextId = userList.length > 0 ? Math.max(...userList.map(u => u.id)) + 1 : 1;
 
-// STATE
-type FilterType = "all" | "active" | "inactive";
+// FUNCTION TO LOAD INITIAL USERS
+function loadInitialUsers(): void {
+    const initialData = [
+        { name: "Mark", email: "mark@email.com" },
+        { name: "Sophia", email: "sophia@email.com", active: false },
+        { name: "Allison", email: "allison@email.com", active: false },
+        { name: "Brian", email: "brian@email.com",},
+        { name: "Diana", email: "diana@email.com", active: false }
+    ];
 
-let currentFilter: FilterType = "all";
-let isOrderedAZ = false;
+    const newUsers = initialData.map(data => {
+        const user = new UserClass(nextId, data.name, data.email, data.active);
+        nextId++;
+        return user;
+    });
 
-// BUTTONS
+    userList = [...userList, ...newUsers];
+}
+
+
+// BUTTONS - FUNCTIONS
 function getVisibleUsers(): User[] {
-    let users = [...userList];
+    let users = userList.filter(user => {
+        if (currentFilter === "active" && !user.active) return false;
+        if (currentFilter === "inactive" && user.active) return false;
+        if (searchTerm && !user.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+        return true;
+    });
 
-    if (currentFilter === "active") {
-        users = users.filter(user => user.active);
+    if (isOrderedAZ) {
+        users = [...users].sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    if (currentFilter === "inactive") {
-        users = users.filter(user => !user.active);
-    }
 
     return users;
 }
-
-function orderUsersAZ(): void {
-    userList.sort((a, b) => a.name.localeCompare(b.name));
-}
-
-function resetUserOrder(): void {
-    userList.sort(
-        (a, b) => originalOrder.indexOf(a.id) - originalOrder.indexOf(b.id)
-    );
-}
-
 
 function updateButtonsText(): void {
     activeBtn.textContent =
@@ -92,36 +107,39 @@ function updateButtonsText(): void {
         currentFilter === "inactive" ? "Show All" : "Inactive Users";
 
     btnOrder.textContent =
-        isOrderedAZ ? "Clear Order" : "Order A-Z";
+        isOrderedAZ ? "Original Order" : "Order A-Z";
 }
-
-// FILTER BUTTONS
-activeBtn.addEventListener("click", () => {
-    currentFilter = currentFilter === "active" ? "all" : "active";
-    updateGlobalData();
-});
-
-inactiveBtn.addEventListener("click", () => {
-    currentFilter = currentFilter === "inactive" ? "all" : "inactive";
-    updateGlobalData();
-});
-
-btnOrder.addEventListener("click", () => {
-    if (!isOrderedAZ) {
-        orderUsersAZ();
-    } else {
-        resetUserOrder();
-    }
-
-    isOrderedAZ = !isOrderedAZ;
-    updateGlobalData();
-});
 
 function updateGlobalData(): void {
     renderUsers(getVisibleUsers());
     updateButtonsText();
     statistics();
 }
+
+// EVENT LISTENERS
+activeBtn.addEventListener("click", () => {
+    currentFilter = currentFilter === "active" ? "all" : "active";
+    searchTerm = "";
+    searchInput.value = "";
+    updateGlobalData();
+});
+
+inactiveBtn.addEventListener("click", () => {
+    currentFilter = currentFilter === "inactive" ? "all" : "inactive";
+    searchTerm = "";
+    searchInput.value = "";
+    updateGlobalData();
+});
+
+btnOrder.addEventListener("click", () => {
+    isOrderedAZ = !isOrderedAZ;
+    updateGlobalData();
+});
+
+searchInput.addEventListener("input", () => {
+    searchTerm = searchInput.value.trim();
+    updateGlobalData();
+});
 
 // CARD ELEMENTS 
 function getTasksElement(): HTMLParagraphElement {
@@ -154,12 +172,7 @@ function addDeleteButton(user: User): HTMLButtonElement {
         e.stopPropagation();
         userList = userList.filter(u => u.id !== user.id);
 
-    const index = originalOrder.indexOf(user.id);
-    if (index !== -1) {
-        originalOrder.splice(index, 1);
-    }
-
-    updateGlobalData();
+        updateGlobalData();
     });
 
     return btn;
@@ -168,28 +181,37 @@ function addDeleteButton(user: User): HTMLButtonElement {
 function createUserCard(user: User): HTMLDivElement {
     const card = document.createElement("div");
     card.classList.add("card");
-
     if (!user.active) card.classList.add("inactive");
 
+    // User ID
+    const userId = document.createElement("p");
+    userId.textContent = `ID: ${user.id}`;
+    userId.classList.add("user-id");
+
+    // Name
     const name = document.createElement("h2");
     name.textContent = user.name;
 
+    // Email
     const email = document.createElement("p");
     email.textContent = user.email;
 
+    // Status
     const status = document.createElement("p");
     status.textContent = user.active ? "Status: Active" : "Status: Inactive";
     status.classList.add("user-status");
 
-    card.append(
-        name,
-        email,
-        getTasksElement(),
-        status,
-        createDeactivateButton(user),
-        addDeleteButton(user)
-    );
+    // Buttons
+    const deactivateBtn = createDeactivateButton(user);
+    const deleteBtn = addDeleteButton(user);
 
+    // Tasks placeholder
+    const tasks = getTasksElement();
+
+    // Append all elements in logical order
+    card.append(userId, name, email, tasks, status, deactivateBtn, deleteBtn);
+
+    // Clicking card opens modal (buttons already stop propagation)
     card.addEventListener("click", () => openUserModal(user));
 
     return card;
@@ -206,15 +228,23 @@ function statistics(): void {
     const total = userList.length;
     const active = userList.filter(u => u.active).length;
     const inactive = total - active;
-    const percentActive = total === 0 ? 0 : Math.round((active / total) * 100);
-    const percentInactive = Math.round((inactive / total) * 100);
+
+    let percentActive: number;
+    let percentInactive: number;
+
+    if (total === 0) {
+        percentActive = 0;
+        percentInactive = 0;
+    } else {
+        percentActive = Math.round((active / total) * 100);
+        percentInactive = 100 - percentActive;
+    }
 
     countUsersElement.innerHTML = `
         Total users: ${total}<br>
         Active users: ${percentActive}%<br>
-        Inactive users: ${percentInactive}%
-    `;
-}
+        Inactive users: ${percentInactive}%`;
+};
 
 // FORM
 form.addEventListener("submit", e => {
@@ -235,15 +265,14 @@ form.addEventListener("submit", e => {
         return;
     }
 
-    const newUser = new UserClass(Date.now(), name, email);
+    const newUser = new UserClass(nextId, name, email);
+    nextId++; // incrementa o ID para o próximo
     userList.push(newUser);
-    originalOrder.push(newUser.id);
 
     userName.value = "";
     userEmail.value = "";
 
     updateGlobalData();
-
 });
 
 // MODAL
@@ -266,6 +295,9 @@ modal.addEventListener("click", e => {
 document.addEventListener("keydown", e => {
     if (e.key === "Escape") modal.classList.remove("show");
 });
+
+//LOAD INITIAL USERS
+loadInitialUsers();
 
 // INIT
 updateGlobalData();
