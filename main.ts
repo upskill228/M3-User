@@ -49,6 +49,8 @@ let userList: User[] = [
     new UserClass(3, "Allison", "allison@email.com", false)
 ];
 
+// INITIAL ORDER - ARRAY
+const originalOrder: number[] = userList.map(user => user.id);
 
 // STATE
 type FilterType = "all" | "active" | "inactive";
@@ -68,12 +70,19 @@ function getVisibleUsers(): User[] {
         users = users.filter(user => !user.active);
     }
 
-    if (isOrderedAZ) {
-        users.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
     return users;
 }
+
+function orderUsersAZ(): void {
+    userList.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function resetUserOrder(): void {
+    userList.sort(
+        (a, b) => originalOrder.indexOf(a.id) - originalOrder.indexOf(b.id)
+    );
+}
+
 
 function updateButtonsText(): void {
     activeBtn.textContent =
@@ -85,6 +94,28 @@ function updateButtonsText(): void {
     btnOrder.textContent =
         isOrderedAZ ? "Clear Order" : "Order A-Z";
 }
+
+// FILTER BUTTONS
+activeBtn.addEventListener("click", () => {
+    currentFilter = currentFilter === "active" ? "all" : "active";
+    updateGlobalData();
+});
+
+inactiveBtn.addEventListener("click", () => {
+    currentFilter = currentFilter === "inactive" ? "all" : "inactive";
+    updateGlobalData();
+});
+
+btnOrder.addEventListener("click", () => {
+    if (!isOrderedAZ) {
+        orderUsersAZ();
+    } else {
+        resetUserOrder();
+    }
+
+    isOrderedAZ = !isOrderedAZ;
+    updateGlobalData();
+});
 
 function updateGlobalData(): void {
     renderUsers(getVisibleUsers());
@@ -122,7 +153,13 @@ function addDeleteButton(user: User): HTMLButtonElement {
     btn.addEventListener("click", e => {
         e.stopPropagation();
         userList = userList.filter(u => u.id !== user.id);
-        updateGlobalData();
+
+    const index = originalOrder.indexOf(user.id);
+    if (index !== -1) {
+        originalOrder.splice(index, 1);
+    }
+
+    updateGlobalData();
     });
 
     return btn;
@@ -168,8 +205,9 @@ function renderUsers(users: User[]): void {
 function statistics(): void {
     const total = userList.length;
     const active = userList.filter(u => u.active).length;
+    const inactive = total - active;
     const percentActive = total === 0 ? 0 : Math.round((active / total) * 100);
-    const percentInactive = total === 0 ? 0 : Math.round((active / total) * 100);
+    const percentInactive = Math.round((inactive / total) * 100);
 
     countUsersElement.innerHTML = `
         Total users: ${total}<br>
@@ -197,27 +235,15 @@ form.addEventListener("submit", e => {
         return;
     }
 
-    userList.push(new UserClass(Date.now(), name, email));
+    const newUser = new UserClass(Date.now(), name, email);
+    userList.push(newUser);
+    originalOrder.push(newUser.id);
+
     userName.value = "";
     userEmail.value = "";
 
     updateGlobalData();
-});
 
-// FILTER BUTTONS
-activeBtn.addEventListener("click", () => {
-    currentFilter = currentFilter === "active" ? "all" : "active";
-    updateGlobalData();
-});
-
-inactiveBtn.addEventListener("click", () => {
-    currentFilter = currentFilter === "inactive" ? "all" : "inactive";
-    updateGlobalData();
-});
-
-btnOrder.addEventListener("click", () => {
-    isOrderedAZ = !isOrderedAZ;
-    updateGlobalData();
 });
 
 // MODAL
