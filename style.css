@@ -155,6 +155,21 @@ p {
     margin: 6px 0;
 }
 
+.new-user {
+    animation: highlightNew 1s ease-out;
+}
+
+@keyframes highlightNew {
+    0% { background-color: #fffb99; } /* amarelo suave */
+    100% { background-color: white; }
+}
+
+.no-users {
+    text-align: center;
+    font-style: italic;
+    color: #555;
+}
+
 /* Form */
 .user-form {
     display: flex;

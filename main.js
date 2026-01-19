@@ -24,16 +24,16 @@ class UserClass {
         this.active = !this.active;
     }
 }
-// STATE
-let currentFilter = "all";
-let searchTerm = "";
-let isOrderedAZ = false;
-// INITIAL DATA
+// ARRAY
 let userList = [
     new UserClass(1, "Chris", "chris@email.com"),
     new UserClass(2, "Anna", "ana@email.com"),
     new UserClass(3, "Allison", "allison@email.com", false)
 ];
+// STATE
+let currentFilter = "all";
+let searchTerm = "";
+let isOrderedAZ = false;
 // NEXT ID
 let nextId = userList.length > 0 ? Math.max(...userList.map(u => u.id)) + 1 : 1;
 // FUNCTION TO LOAD INITIAL USERS
@@ -136,6 +136,11 @@ function createUserCard(user) {
     card.classList.add("card");
     if (!user.active)
         card.classList.add("inactive");
+    // Destacar se for o último usuário adicionado
+    if (user.id === nextId - 1) {
+        card.classList.add("new-user");
+        setTimeout(() => card.classList.remove("new-user"), 1000);
+    }
     // User ID
     const userId = document.createElement("p");
     userId.textContent = `ID: ${user.id}`;
@@ -164,6 +169,13 @@ function createUserCard(user) {
 //RENDER
 function renderUsers(users) {
     container.innerHTML = "";
+    if (users.length === 0) {
+        const noUsers = document.createElement("p");
+        noUsers.textContent = "No users available";
+        noUsers.classList.add("no-users");
+        container.appendChild(noUsers);
+        return;
+    }
     users.forEach(user => container.appendChild(createUserCard(user)));
 }
 // STATISTICS
