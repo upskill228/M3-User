@@ -192,7 +192,7 @@ function createUserCard(user: User): HTMLDivElement {
     userId.textContent = `ID: ${user.id}`;
     userId.classList.add("user-id");
 
-    const name = document.createElement("h2");
+    const name = document.createElement("h3");
     name.textContent = user.name;
 
     const email = document.createElement("p");
