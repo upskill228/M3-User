@@ -6,7 +6,7 @@ const userEmail = document.querySelector("#userEmail");
 const activeBtn = document.querySelector("#showActive");
 const inactiveBtn = document.querySelector("#showInactive");
 const btnOrder = document.querySelector("#btnOrder");
-const countUsersElement = document.querySelector("#countUsers");
+const userStatsElement = document.querySelector("#userStats");
 const formError = document.querySelector("#formError");
 const searchInput = document.querySelector("#searchUser");
 const clearSearchBtn = document.querySelector(".clear-search");
@@ -35,8 +35,9 @@ let userList = [
 let currentFilter = "all";
 let searchTerm = "";
 let isOrderedAZ = false;
-// NEXT ID
-let nextId = userList.length > 0 ? Math.max(...userList.map(u => u.id)) + 1 : 1;
+let nextId = userList.length > 0
+    ? Math.max(...userList.map(u => u.id)) + 1
+    : 1;
 // FUNCTION TO LOAD INITIAL USERS
 function loadInitialUsers() {
     const initialData = [
@@ -141,6 +142,7 @@ function createUserCard(user) {
     card.classList.add("card");
     if (!user.active)
         card.classList.add("inactive");
+    // Elements
     const userId = document.createElement("p");
     userId.textContent = `ID: ${user.id}`;
     userId.classList.add("user-id");
@@ -149,11 +151,12 @@ function createUserCard(user) {
     const email = document.createElement("p");
     email.textContent = user.email;
     const status = document.createElement("p");
-    status.textContent = user.active ? "Status: Active" : "Status: Inactive";
+    status.textContent = user.active ? "Status: Active user" : "Status: Inactive user";
     status.classList.add("user-status");
     const deactivateBtn = createDeactivateButton(user);
     const deleteBtn = addDeleteButton(user);
     const tasks = getTasksElement();
+    // Card structure
     const header = document.createElement("div");
     header.classList.add("card-header");
     header.append(userId, name);
@@ -164,6 +167,7 @@ function createUserCard(user) {
     footer.classList.add("card-footer");
     footer.append(deactivateBtn, deleteBtn);
     card.append(header, body, footer);
+    // Modal
     card.addEventListener("click", () => openUserModal(user));
     return card;
 }
@@ -194,10 +198,11 @@ function statistics() {
         percentActive = Math.round((active / total) * 100);
         percentInactive = 100 - percentActive;
     }
-    countUsersElement.innerHTML = `
-        Total users: ${total}<br>
-        Active users: ${percentActive}%<br>
-        Inactive users: ${percentInactive}%`;
+    userStatsElement.innerHTML = `
+        <h3>Stats</h3>
+        <p>Total users: <strong>${total}</strong></p><br>
+        <p>Active users: <strong>${percentActive}%</strong></p><br>
+        <p>Inactive users: <strong>${percentInactive}%</strong></p>`;
 }
 ;
 // FORM
@@ -241,7 +246,6 @@ document.addEventListener("keydown", e => {
     if (e.key === "Escape")
         modal.classList.remove("show");
 });
-//LOAD INITIAL USERS
+//INIT
 loadInitialUsers();
-// INIT
 updateUI();
